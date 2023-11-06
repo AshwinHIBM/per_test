@@ -19,6 +19,8 @@ provider "ibm" {
 
 locals {
   tcp_ports = [22623, 80, 22]
+  api_servers       = var.ips
+  api_servers_count = length(local.api_servers)
 }
 data "ibm_resource_group" "resource_group" {
   name = var.resource_group
@@ -124,4 +126,28 @@ resource "ibm_is_lb_listener" "api_listener_int" {
   port         = 80
   protocol     = "tcp"
   default_pool = ibm_is_lb_pool.api_pool_int.id
+}
+
+resource "ibm_is_lb_pool_member" "api_member_int" {
+  count          = local.api_servers_count
+  depends_on     = [ibm_is_lb_pool_member.machine_config_member]
+  lb             = ibm_is_lb.load_balancer_int.id
+  pool           = ibm_is_lb_pool.api_pool_int.id
+  port           = 80
+  target_address = local.api_servers[count.index]
+}
+
+resource "ibm_is_lb_pool_member" "machine_config_member" {
+  count          = local.api_servers_count
+  lb             = ibm_is_lb.load_balancer_int.id
+  pool           = ibm_is_lb_pool.machine_config_pool.id
+  port           = 22623
+  target_address = local.api_servers[count.index]
+}
+resource "ibm_is_lb_pool_member" "api_member" {
+  count          = local.api_servers_count
+  lb             = ibm_is_lb.load_balancer.id
+  pool           = ibm_is_lb_pool.api_pool.id
+  port           = 80
+  target_address = local.api_servers[count.index]
 }

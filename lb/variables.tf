@@ -27,3 +27,9 @@ variable "ibmcloud_region" {
 variable "ibmcloud_zone" {
   default = "osa21"
 }
+#variable "lb_int_id" { type = string }
+#variable "lb_ext_id" { type = string }
+#variable "machine_cfg_pool_id" { type = string }
+#variable "api_pool_int_id" { type = string }
+#variable "api_pool_ext_id" { type = string }
+variable "ips" { default = [] }
