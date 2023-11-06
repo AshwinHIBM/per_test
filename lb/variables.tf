@@ -33,3 +33,7 @@ variable "ibmcloud_zone" {
 #variable "api_pool_int_id" { type = string }
 #variable "api_pool_ext_id" { type = string }
 variable "ips" { default = [] }
+variable "bootstrap_ip" {
+  type        = string
+  description = "The IP address of the bootstrap node."
+}

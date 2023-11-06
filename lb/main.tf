@@ -151,3 +151,31 @@ resource "ibm_is_lb_pool_member" "api_member" {
   port           = 80
   target_address = local.api_servers[count.index]
 }
+
+resource "ibm_is_lb_pool" "bootstrap_pool" {
+  name           = "bootstrap-node"
+  lb             = ibm_is_lb.load_balancer.id
+  algorithm      = "round_robin"
+  protocol       = "tcp"
+  health_delay   = 5
+  health_retries = 2
+  health_timeout = 2
+  health_type    = "tcp"
+}
+
+
+resource "ibm_is_lb_listener" "bootstrap_listener" {
+  lb           = ibm_is_lb.load_balancer.id
+  port         = 22
+  protocol     = "tcp"
+  default_pool = ibm_is_lb_pool.bootstrap_pool.id
+}
+
+# explicit depends because the LB will be in `UPDATE_PENDING` state and this will fail
+resource "ibm_is_lb_pool_member" "bootstrap" {
+  depends_on     = [ibm_is_lb_listener.bootstrap_listener]
+  lb             = ibm_is_lb.load_balancer.id
+  pool           = ibm_is_lb_pool.bootstrap_pool.id
+  port           = 22
+  target_address = var.bootstrap_ip
+}
