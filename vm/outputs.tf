@@ -1,6 +1,7 @@
 output "bootstrap_ip" {
-  value = ibm_pi_instance.bootstrap[0].pi_network[*]
+  value = local.bootstrap_ips[0]
 }
+
 output "clusternode_ip" {
-  value = ibm_pi_instance.cluster_node[0].pi_network[*]
+  value = local.clusternode_ips[0]
 }

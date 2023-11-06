@@ -30,6 +30,11 @@ data "ignition_config" "vm_ignition" {
   files = [data.ignition_file.vm_hostname[count.index].rendered]
 }
 
+data "ignition_config" "clusternode_ignition" {
+  count = var.rhcos_count
+  users = [data.ignition_user.vm_user.rendered]
+}
+
 data "ibm_pi_image" "rhcos_image" {
   pi_image_name        = var.rhcos_image_name
   pi_cloud_instance_id = var.service_instance_id
@@ -77,4 +82,16 @@ resource "ibm_pi_instance" "cluster_node" {
   pi_network {
     network_id = data.ibm_pi_dhcp.dhcp_service.network_id
   }
+  pi_user_data         = base64encode(data.ignition_config.clusternode_ignition[count.index].rendered)
+}
+
+locals {
+  bootstrap_ips = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.bootstrap[0].pi_network[0].mac_address == lease.instance_mac]
+  clusternode_ips = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.cluster_node[0].pi_network[0].mac_address == lease.instance_mac]
+}
+
+data "ibm_pi_dhcp" "dhcp_service_refresh" {
+  # depends_on           = [time_sleep.wait_for_bootstrap_macs]
+  pi_cloud_instance_id = var.cloud_instance_id
+  pi_dhcp_id           = var.dhcp_id
 }

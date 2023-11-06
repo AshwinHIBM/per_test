@@ -31,3 +31,8 @@ variable "keypair_name" {
 variable "password_hash" {
   default = ""
 }
+
+variable "cloud_instance_id" {
+  type        = string
+  description = "The Power VS Service Instance (aka Cloud Instance) ID."
+}
