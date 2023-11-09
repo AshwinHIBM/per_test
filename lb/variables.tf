@@ -22,10 +22,10 @@ variable "ibmcloud_api_key" {
   default = ""
 }
 variable "ibmcloud_region" {
-  default = "osa"
+  default = "dal"
 }
 variable "ibmcloud_zone" {
-  default = "osa21"
+  default = "dal10"
 }
 #variable "lb_int_id" { type = string }
 #variable "lb_ext_id" { type = string }

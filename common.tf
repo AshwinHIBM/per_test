@@ -13,6 +13,6 @@
 #}
 #provider "ibm" {
 #  ibmcloud_api_key = var.ibmcloud_api_key
-#  region           = "osa"
+#  region           = "dal"
 #  zone             = var.ibmcloud_zone
 #}

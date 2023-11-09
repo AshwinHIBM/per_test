@@ -1,6 +1,6 @@
 provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
-  region = "jp-osa"
+  region = "us-south"
 }
 
 data "ibm_resource_group" "rg" {

@@ -2,10 +2,10 @@ variable "ibmcloud_api_key" {
   default = ""
 }
 variable "ibmcloud_region" {
-  default = "osa"
+  default = "dal"
 }
 variable "ibmcloud_zone" {
-  default = "osa21"
+  default = "dal10"
 }
 variable "cluster_id" {
   type        = string
