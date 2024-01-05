@@ -52,7 +52,7 @@ resource "ibm_pi_instance" "bootstrap" {
   count                = 1
   pi_memory            = "2"
   pi_processors        = "0.25"
-  pi_instance_name     = "${local.vm_id}-rhcos-bootstrap"
+  pi_instance_name     = "${local.vm_id}-rhcos-bootstrap1"
   pi_proc_type         = "shared"
   pi_image_id          = data.ibm_pi_image.rhcos_image.id
   pi_storage_pool      = data.ibm_pi_image.rhcos_image.storage_pool
@@ -71,7 +71,7 @@ resource "ibm_pi_instance" "cluster_node" {
   count                = 1
   pi_memory            = "2"
   pi_processors        = "0.25"
-  pi_instance_name     = "${local.vm_id}-rhcos-master"
+  pi_instance_name     = "${local.vm_id}-rhcos-master1"
   pi_proc_type         = "shared"
   pi_image_id          = data.ibm_pi_image.rhcos_image.id
   pi_storage_pool      = data.ibm_pi_image.rhcos_image.storage_pool
@@ -84,6 +84,11 @@ resource "ibm_pi_instance" "cluster_node" {
   }
   pi_user_data         = base64encode(data.ignition_config.clusternode_ignition[count.index].rendered)
 }
+resource "time_sleep" "wait_for_bootstrap_macs" {
+  create_duration = "3m"
+
+  depends_on = [ibm_pi_instance.bootstrap]
+}
 
 locals {
   bootstrap_ips = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.bootstrap[0].pi_network[0].mac_address == lease.instance_mac]
@@ -91,7 +96,7 @@ locals {
 }
 
 data "ibm_pi_dhcp" "dhcp_service_refresh" {
-  # depends_on           = [time_sleep.wait_for_bootstrap_macs]
+  depends_on           = [time_sleep.wait_for_bootstrap_macs]
   pi_cloud_instance_id = var.cloud_instance_id
   pi_dhcp_id           = var.dhcp_id
 }

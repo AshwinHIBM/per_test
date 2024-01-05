@@ -1,3 +1,12 @@
+variable "ibmcloud_api_key" {
+  default = ""
+}
+variable "ibmcloud_region" {
+  default = "dal"
+}
+variable "ibmcloud_zone" {
+  default = "dal10"
+}
 variable "cluster_id" {
   type        = string
   description = "The ID created by the installer to uniquely identify the created cluster."

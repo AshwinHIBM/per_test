@@ -9,7 +9,7 @@ data "ibm_resource_group" "rg" {
 
 resource "ibm_is_vpc" "new_vpc" {
   count          = var.vpc_name == "" ? 1 : 0
-  name           = "vpc-${var.cluster_id}-2"
+  name           = "vpc-${var.cluster_id}-power"
   classic_access = false
   resource_group = data.ibm_resource_group.rg.id
 }
@@ -34,7 +34,7 @@ resource "ibm_is_subnet" "new_vpc_subnet" {
   vpc                      = data.ibm_is_vpc.ocp_vpc.id
   resource_group           = data.ibm_resource_group.rg.id
   total_ipv4_address_count = 256
-  zone                     = "Osaka 2"
+  zone                     = "us-south-1"
   tags                     = [var.cluster_id]
 }
 
