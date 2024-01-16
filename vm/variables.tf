@@ -19,9 +19,6 @@ variable "rhcos_image_name" {
 variable "keypair_name" {
   default = ""
 }
-variable "password_hash" {
-  default = ""
-}
 
 variable "cos_bucket_location" {
   type        = string
@@ -36,6 +33,7 @@ variable "cos_instance_location" {
 variable "cos_storage_class" {
   type        = string
   description = "The storage class for the Cloud Object Store instance."
+  default     = "standard"
 }
 
 variable "cloud_instance_id" {

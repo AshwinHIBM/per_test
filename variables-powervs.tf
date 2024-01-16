@@ -7,10 +7,20 @@ variable "powervs_api_key" {
   default = ""
 }
 
+variable "powervs_cos_instance_location" {
+  type        = string
+  description = "Specifies whether the Cloud Object Store instance is global or in a specific region. Used for the ignition file."
+}
+
 variable "powervs_dns_server" {
   type        = string
   description = "The desired DNS server for the DHCP instance to server."
   default     = "1.1.1.1"
+}
+
+variable "powervs_image_bucket_file_name" {
+  type        = string
+  description = "File name of the image in the COS bucket."
 }
 
 variable "powervs_image_bucket_name" {
@@ -21,6 +31,10 @@ variable "powervs_image_bucket_name" {
 variable "powervs_image_cos_bucket_location" {
   type        = string
   description = "The region in which to create the Cloud Object Store bucket. Used for the igntion file."
+}
+
+variable "powervs_keypair_name" {
+  default = ""
 }
 
 variable "powervs_machine_cidr" {
@@ -56,11 +70,6 @@ variable "powervs_zone" {
 variable "vpc_region" {
   type        = string
   description = "Region of a VPC connection to the transit gateway"
-}
-
-variable "subnet_id" {
-  type        = string
-  description = "The ID of the VPC subnet."
 }
 
 variable "vpc_zone" {
