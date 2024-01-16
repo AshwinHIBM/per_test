@@ -1,12 +1,3 @@
-variable "ibmcloud_api_key" {
-  default = ""
-}
-variable "ibmcloud_region" {
-  default = "dal"
-}
-variable "ibmcloud_zone" {
-  default = "dal10"
-}
 variable "system_type" {
   default = "s922"
 }
@@ -68,14 +59,19 @@ variable "enable_snat" {
 #  description = "The ignition file."
 #}
 
-variable "powervs_image_bucket_name" {
+variable "image_bucket_file_name" {
+  type        = string
+  description = "File name of the image in the COS bucket."
+}
+
+variable "image_bucket_name" {
   type        = string
   description = "Name of the COS bucket containing the image to be imported."
 }
 
-variable "powervs_image_bucket_file_name" {
-  type        = string
-  description = "File name of the image in the COS bucket."
+variable "password_hash" {
+  type = string
+  description = "Hash of the bootstrap and cluster node password"
 }
 
 variable "resource_group" {

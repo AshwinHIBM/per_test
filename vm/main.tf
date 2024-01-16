@@ -1,3 +1,17 @@
+terraform {
+ required_providers {
+    ibm = {
+      source  = "ibm-cloud/ibm"
+      version = "1.60.0"
+    }
+    ignition = {
+      source  = "community-terraform-providers/ignition"
+      version = "~> 2.1.0"
+    }
+  }
+  required_version = ">= 1.0.0"
+}
+
 resource "random_id" "label" {
   byte_length = "2" # Since we use the hex, the word length would double
   prefix      = "${var.vm_prefix}-"
@@ -7,28 +21,28 @@ locals {
   vm_id = random_id.label.hex
 }
 
-#data "ignition_user" "vm_user" {
-#  name                = "core"
-#  password_hash = var.password_hash
-#}
+data "ignition_user" "vm_user" {
+  name                = "core"
+  password_hash       = var.password_hash
+}
 
-#data "ignition_file" "vm_hostname" {
-#  count     = var.rhcos_count
-#  overwrite = true
-#  mode      = "420" // 0644
-#  path      = "/etc/hostname"
-#  content {
-#    content = <<EOF
-#${local.vm_id}-rhcos-${count.index}
-#EOF
-#  }
-#}
+data "ignition_file" "clusternode_ignition" {
+  count     = var.rhcos_count
+  overwrite = true
+  mode      = "420" // 0644
+  path      = "/etc/hostname"
+  content {
+    source {
+      source = var.
+    }
+  }
+}
 
-#data "ignition_config" "vm_ignition" {
-#  count = var.rhcos_count
-#  users = [data.ignition_user.vm_user.rendered]
-#  files = [data.ignition_file.vm_hostname[count.index].rendered]
-#}
+data "ignition_config" "vm_ignition" {
+  count = var.rhcos_count
+  users = [data.ignition_user.vm_user.rendered]
+  files = [data.ignition_file.clusternode_ignition.rendered]
+}
 
 #data "ignition_config" "clusternode_ignition" {
 #  count = var.rhcos_count
@@ -36,18 +50,17 @@ locals {
 #}
 
 resource "ibm_pi_image" "boot_image" {
- # provider                  = ibm.powervs
   pi_image_name             = "rhcos-${var.cluster_id}"
   pi_cloud_instance_id      = var.workspace_id
-  pi_image_bucket_name      = var.powervs_image_bucket_name
+  pi_image_bucket_name      = var.image_bucket_name
   pi_image_bucket_access    = "public"
   pi_image_bucket_region    = var.cos_bucket_location
-  pi_image_bucket_file_name = var.powervs_image_bucket_file_name
+  pi_image_bucket_file_name = var.image_bucket_file_name
   pi_image_storage_type     = "tier1"
 }
 
 data "ibm_pi_dhcp" "dhcp_service" {
-  pi_cloud_instance_id    = var.service_instance_id
+  pi_cloud_instance_id    = var.workspace_id
   pi_dhcp_id              = var.dhcp_id
 }
 data "ibm_pi_key" "key" {
@@ -141,7 +154,7 @@ resource "time_sleep" "wait_for_bootstrap_macs" {
 }
 
 locals {
-  bootstrap_ips = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.bootstrap[0].pi_network[0].mac_address == lease.instance_mac]
+  bootstrap_ips   = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.bootstrap[0].pi_network[0].mac_address == lease.instance_mac]
   clusternode_ips = [for lease in data.ibm_pi_dhcp.dhcp_service_refresh.leases : lease.instance_ip if ibm_pi_instance.cluster_node[0].pi_network[0].mac_address == lease.instance_mac]
 }
 

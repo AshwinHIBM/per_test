@@ -2,19 +2,10 @@ terraform {
   required_providers {
     ibm = {
       source  = "ibm-cloud/ibm"
-      version = "1.56.1"
-    }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = "~> 2.1.0"
+      version = "1.60.0"
     }
   }
   required_version = ">= 1.0.0"
-}
-provider "ibm" {
-  ibmcloud_api_key = var.ibmcloud_api_key
-  region           = "us-south"
-  zone             = var.ibmcloud_zone
 }
 
 locals {
@@ -50,7 +41,7 @@ resource "ibm_is_security_group_rule" "outbound_any" {
 resource "ibm_is_lb" "load_balancer" {
   name            = "${var.cluster_id}-loadbalancer"
   resource_group  = data.ibm_resource_group.resource_group.id
-  subnets         = [var.vpc_subnet_id]
+  subnets         = [var.subnet_id]
   security_groups = [ibm_is_security_group.ocp_security_group.id]
   tags            = [var.cluster_id, "${var.cluster_id}-loadbalancer"]
   type            = "public"
@@ -59,7 +50,7 @@ resource "ibm_is_lb" "load_balancer" {
 resource "ibm_is_lb" "load_balancer_int" {
   name            = "${var.cluster_id}-loadbalancer-int"
   resource_group  = data.ibm_resource_group.resource_group.id
-  subnets         = [var.vpc_subnet_id]
+  subnets         = [var.subnet_id]
   security_groups = [ibm_is_security_group.ocp_security_group.id]
   tags            = [var.cluster_id, "${var.cluster_id}-loadbalancer-int"]
   type            = "private"

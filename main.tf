@@ -1,42 +1,86 @@
-terraform {
-  required_providers {
-    ibm = {
-      source  = "ibm-cloud/ibm"
-      version = "1.56.1"
-    }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = "~> 2.1.0"
-    }
-  }
-  required_version = ">= 1.0.0"
-}
 provider "ibm" {
-  ibmcloud_api_key = var.ibmcloud_api_key
-  region           = "dal"
-  zone             = var.ibmcloud_zone
+  alias            = "vpc"
+  ibmcloud_api_key = var.powervs_api_key
+  region           = var.vpc_region
+  zone             = var.vpc_zone
 }
 
-#module "vpc" {
-#  source = "./vpc"
+provider "ibm" {
+   alias            = "powervs"
+   ibmcloud_api_key = var.powervs_api_key
+   region           = var.powervs_region
+   zone             = var.powervs_zone
+}
 
+module "dhcp" {
+  providers = {
+    ibm = ibm.powervs
+  }
+  source = "./dhcp"
+  cluster_id             = var.cluster_id
+  dns_server             = var.powervs_dns_server
+  machine_cidr           = var.powervs_machine_cidr
+  workspace_id           = module.workspace.pi_workspace_id
+}
 
-#  cluster_id           = var.cluster_id
-#  publish_strategy     = var.powervs_publish_strategy
-#  resource_group       = var.powervs_resource_group
-#  vpc_zone             = var.powervs_vpc_zone
- # vpc_subnet_name      = var.powervs_vpc_subnet_name
- # vpc_name             = var.powervs_vpc_name
- # vpc_gateway_name     = var.powervs_vpc_gateway_name
- # vpc_gateway_attached = var.powervs_vpc_gateway_attached
- # wait_for_vpc         = var.powervs_wait_for_vpc
-#}
-
-module "lb" {
+module "load_balancer" {
+  providers = {
+    ibm = ibm.vpc
+  }
   source = "./lb"
+  bootstrap_ip         = module.vm.bootstrap_ip
+  cluster_id           = var.cluster_id
+  ips                  = toset([module.vm.bootstrap_ip,module.vm.clusternode_ip])
+  resource_group       = var.powervs_resource_group
+  service_instance_crn = module.iaas.si_crn
+  vpc_crn              = module.vpc.workspace_crn
+  vpc_id               = var.powervs_vpc_id
+  vpc_region           = var.vpc_region
+  vpc_subnet_id        = module.vpc.vpc_subnet_id
+}
 
+module "transit_gateway" {
+  providers = {
+    ibm = ibm.vpc
+  }
+  source = "./transit_gateway"
+  cluster_id               = var.cluster_id
+  resource_group           = var.powervs_resource_group
+  workspace_crn            = module.workspace.pi_workspace_crn
+  vpc_crn                  = module.vpc.vpc_crn
+  vpc_region               = var.vpc_region
+}
+
+module "vpc" {
+  providers = {
+    ibm = ibm.vpc
+  }
+  source = "./vpc"
+  cluster_id       = var.cluster_id
+  resource_group   = var.powervs_resource_group
+  vpc_zone         = var.vpc_zone 
+}
+
+module "workspace" {
+  providers = {
+    ibm = ibm.powervs
+  }
+  source = "./workspace"
   cluster_id     = var.cluster_id
   resource_group = var.powervs_resource_group
-  vpc_id         = var.vpc_id
-  vpc_subnet_id  = var.vpc_subnet_id
+  zone           = var.powervs_zone
 }
+
+#module "vm" {
+#  providers = {
+#    ibm = ibm.powervs
+#  }
+#  source = "./vm"
+#  cluster_id             = var.cluster_id
+#  cos_bucket_location    = var.powervs_image_cos_bucket_location
+#  dhcp_id                = module.dhcp.dhcp_id
+#  image_bucket_file_name = var.powervs_image_bucket_file_name
+#  image_bucket_name      = var.powervs_image_bucket_name
+#  password_hash          = var.powervs_password_hash
+#  workspace_id           = module.workspace.pi_workspace_id
+#}

@@ -8,16 +8,7 @@ variable "resource_group" {
   description = "The name of the Power VS resource group to which the user belongs."
 }
 
-variable "powervs_zone" {
+variable "zone" {
   type        = string
   description = "The Power VS zone in which to create resources."
-}
-variable "ibmcloud_api_key" {
-  default = ""
-}
-variable "ibmcloud_region" {
-  default = "dal"
-}
-variable "ibmcloud_zone" {
-  default = "dal10"
 }

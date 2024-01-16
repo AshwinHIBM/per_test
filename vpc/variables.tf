@@ -1,13 +1,3 @@
-variable "ibmcloud_api_key" {
-  default = ""
-}
-variable "ibmcloud_region" {
-  default = "dal"
-}
-variable "ibmcloud_zone" {
-  default = "dal10"
-}
-
 variable "cluster_id" {
   type        = string
   description = "The ID created by the installer to uniquely identify the created cluster."
@@ -16,6 +6,7 @@ variable "cluster_id" {
 variable "publish_strategy" {
   type        = string
   description = "Publishing strategy used by cluster. Internal or External"
+  default     = "External"
 }
 
 variable "resource_group" {
@@ -34,26 +25,8 @@ variable "wait_for_vpc" {
   default     = "60s"
 }
 
-variable "vpc_subnet_name" {
-  type        = string
-  description = "The name of a pre-created VPC subnet."
-  default     = ""
-}
-
-variable "vpc_name" {
-  type        = string
-  description = "The name of a pre-created VPC."
-  default     = ""
-}
-
 variable "vpc_gateway_name" {
   type        = string
-  description = "Name of the pre-existing VPC gateway."
+  description = "The name of an existing VPC gateway"
   default     = ""
-}
-
-variable "vpc_gateway_attached" {
-  type        = bool
-  description = "Boolean indicating if the pre-existing VPC gateway already attached."
-  default     = false
 }

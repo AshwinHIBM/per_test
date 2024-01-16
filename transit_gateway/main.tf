@@ -1,3 +1,13 @@
+terraform {
+ required_providers {
+    ibm = {
+      source  = "ibm-cloud/ibm"
+      version = "1.60.0"
+    }
+ }
+ required_version = ">= 1.0.0"
+}
+
 data "ibm_resource_group" "rg_pvs_ipi_rg" {
   name = var.resource_group
 }
@@ -20,5 +30,5 @@ resource "ibm_tg_connection" "tg_connection_pvs" {
   gateway      = resource.ibm_tg_gateway.transit_gateway.id
   network_type = "power_virtual_server"
   name         = "tg-${var.cluster_id}-conn-pvs"
-  network_id   = var.service_instance_crn
+  network_id   = var.workspace_crn
 }

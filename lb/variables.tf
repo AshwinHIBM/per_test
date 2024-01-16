@@ -8,7 +8,7 @@ variable "vpc_id" {
   description = "The ID of the VPC."
 }
 
-variable "vpc_subnet_id" {
+variable "subnet_id" {
   type        = string
   description = "The ID of the VPC subnet."
 }
