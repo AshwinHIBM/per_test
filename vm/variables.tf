@@ -25,11 +25,6 @@ variable "cos_bucket_location" {
   description = "The region in which to create the Cloud Object Store bucket. Used for the igntion file."
 }
 
-variable "cos_instance_location" {
-  type        = string
-  description = "Specifies whether the Cloud Object Store instance is global or in a specific region. Used for the ignition file."
-}
-
 variable "cos_storage_class" {
   type        = string
   description = "The storage class for the Cloud Object Store instance."

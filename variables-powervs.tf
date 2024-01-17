@@ -7,11 +7,6 @@ variable "powervs_api_key" {
   default = ""
 }
 
-variable "powervs_cos_instance_location" {
-  type        = string
-  description = "Specifies whether the Cloud Object Store instance is global or in a specific region. Used for the ignition file."
-}
-
 variable "powervs_dns_server" {
   type        = string
   description = "The desired DNS server for the DHCP instance to server."

@@ -27,7 +27,7 @@ module "dhcp" {
 #  providers = {
 #    ibm = ibm.vpc
 #  }
-# source = "./lb"
+#  source = "./lb"
 #  bootstrap_ip         = module.vm.bootstrap_ip
 #  cluster_id           = var.cluster_id
 #  ips                  = toset([module.vm.bootstrap_ip,module.vm.clusternode_ip])
@@ -69,7 +69,6 @@ module "vm" {
   cloud_instance_id      = module.workspace.pi_workspace_id
   cluster_id             = var.cluster_id
   cos_bucket_location    = var.powervs_image_cos_bucket_location
-  cos_instance_location  = var.powervs_cos_instance_location
   dhcp_id                = module.dhcp.dhcp_id
   image_bucket_file_name = var.powervs_image_bucket_file_name
   keypair_name           = var.powervs_keypair_name
