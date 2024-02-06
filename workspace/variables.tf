@@ -12,3 +12,9 @@ variable "zone" {
   type        = string
   description = "The Power VS zone in which to create resources."
 }
+
+variable "wait_for_workspace" {
+  type        = string
+  default     = "60s"
+  description = "Time to wait after creating a Power VS workspace to allow PER to initialize"
+}

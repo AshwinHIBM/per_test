@@ -22,3 +22,8 @@ resource "ibm_pi_workspace" "workspace" {
 data "ibm_pi_workspace" "workspace_data" {
   pi_cloud_instance_id = resource.ibm_pi_workspace.workspace.id
 }
+
+resource "time_sleep" "wait_for_workspace" {
+  depends_on      = [ibm_pi_workspace.workspace]
+  create_duration = var.wait_for_workspace
+}
