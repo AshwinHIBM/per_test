@@ -25,12 +25,6 @@ variable "cos_bucket_location" {
   description = "The region in which to create the Cloud Object Store bucket. Used for the igntion file."
 }
 
-variable "cos_storage_class" {
-  type        = string
-  description = "The storage class for the Cloud Object Store instance."
-  default     = "standard"
-}
-
 variable "cloud_instance_id" {
   type        = string
   description = "The Power VS Service Instance (aka Cloud Instance) ID."
@@ -41,16 +35,22 @@ variable "cluster_id" {
   description = "The ID created by the installer to uniquely identify the created cluster."
 }
 
+variable "cos_storage_class" {
+   type        = string
+   default     = "smart"
+   description = "The storage class for the Cloud Object Store instance."
+}
+
 variable "enable_snat" {
   type        = bool
   description = "Indicates if the DHCP server will have SNAT enabled."
   default     = true
 }
 
-#variable "ignition" {
-#  type        = string
-#  description = "The ignition file."
-#}
+variable "ignition" {
+   type        = string
+   description = "The ignition file."
+}
 
 variable "image_bucket_file_name" {
   type        = string

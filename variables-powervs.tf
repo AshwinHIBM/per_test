@@ -13,6 +13,11 @@ variable "powervs_dns_server" {
   default     = "1.1.1.1"
 }
 
+variable "powervs_ignition" {
+   type        = string
+   description = "The ignition file."
+}
+
 variable "powervs_image_bucket_file_name" {
   type        = string
   description = "File name of the image in the COS bucket."

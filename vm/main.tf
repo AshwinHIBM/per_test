@@ -61,18 +61,40 @@ data "ibm_pi_key" "key" {
 }
 
 data "ibm_resource_group" "cos_group" {
-  name = var.resource_group
+   name = var.resource_group
 }
 
 resource "ibm_resource_instance" "cos_instance" {
-  name              = "${var.cluster_id}-cos"
-  resource_group_id = data.ibm_resource_group.cos_group.id
-  service           = "cloud-object-storage"
-  plan              = "standard"
-  location          = "global"
-  tags              = [var.cluster_id]
+   name              = "${var.cluster_id}-cos"
+   resource_group_id = data.ibm_resource_group.cos_group.id
+   service           = "cloud-object-storage"
+   plan              = "standard"
+   location          = "global"
+   tags              = [var.cluster_id]
+}
+# Create an IBM COS Bucket to store ignition
+resource "ibm_cos_bucket" "ignition" {
+   bucket_name          = "${var.cluster_id}-bootstrap-ign"
+   resource_instance_id = ibm_resource_instance.cos_instance.id
+   region_location      = var.cos_bucket_location
+   storage_class        = var.cos_storage_class
 }
 
+resource "ibm_resource_key" "cos_service_cred" {
+   name                 = "${var.cluster_id}-cred"
+   role                 = "Reader"
+   resource_instance_id = ibm_resource_instance.cos_instance.id
+   parameters           = { HMAC = true }
+}
+
+# Place the bootstrap ignition file in the ignition COS bucket
+resource "ibm_cos_bucket_object" "ignition" {
+  bucket_crn      = ibm_cos_bucket.ignition.crn
+   bucket_location = ibm_cos_bucket.ignition.region_location
+   content         = var.ignition
+   key             = "bootstrap.ign"
+   etag            = md5(var.ignition)
+}
 data "ibm_iam_auth_token" "iam_token" {}
 
 resource "ibm_pi_instance" "bootstrap" {
@@ -88,14 +110,14 @@ resource "ibm_pi_instance" "bootstrap" {
   pi_network {
     network_id = data.ibm_pi_dhcp.dhcp_service.network_id
   }
-  #pi_user_data = base64encode(templatefile("${path.module}/template/clusternode_fetch.ign", {
-  #  PROTOCOL    = "https"
-  #  HOSTNAME    = ibm_cos_bucket.ignition.s3_endpoint_public
-  #  BUCKET_NAME = ibm_cos_bucket.ignition.bucket_name
-  #  OBJECT_NAME = ibm_cos_bucket_object.ignition.key
-  #  IAM_TOKEN   = data.ibm_iam_auth_token.iam_token.iam_access_token
-  #}))
-  pi_user_data         = base64encode(data.ignition_config.bootstrap_ignition.rendered)  
+  pi_user_data = base64encode(templatefile("${path.module}/templates/bootstrap.ign", {
+     PROTOCOL    = "https"
+     HOSTNAME    = ibm_cos_bucket.ignition.s3_endpoint_public
+     BUCKET_NAME = ibm_cos_bucket.ignition.bucket_name
+     OBJECT_NAME = ibm_cos_bucket_object.ignition.key
+     IAM_TOKEN   = data.ibm_iam_auth_token.iam_token.iam_access_token
+  }))
+ # pi_user_data         = base64encode(data.ignition_config.bootstrap_ignition.rendered)  
 }
 
 resource "ibm_pi_instance" "cluster_node" {

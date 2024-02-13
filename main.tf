@@ -72,6 +72,7 @@ module "vm" {
   dhcp_id                = module.dhcp.dhcp_id
   image_bucket_file_name = var.powervs_image_bucket_file_name
   keypair_name           = var.powervs_keypair_name
+  ignition               = var.powervs_ignition
   image_bucket_name      = var.powervs_image_bucket_name
   password_hash          = var.powervs_password_hash
   resource_group         = var.powervs_resource_group
